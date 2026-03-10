@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,9 +8,12 @@
   <meta name="description" content="中学1年生向けRPG風数学学習アプリ。正負の数・文字式・方程式などを冒険しながら楽しく学べる！">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800;900&family=Zen+Kaku+Gothic+New:wght@400;700;900&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800;900&family=Zen+Kaku+Gothic+New:wght@400;700;900&display=swap"
+    rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
   <!-- ========== パーティクル背景 ========== -->
   <div id="particles-bg" aria-hidden="true"></div>
@@ -60,18 +64,23 @@
   <div id="screen-character" class="screen">
     <div class="screen-header">
       <button id="btn-back-to-title" class="btn-back">← もどる</button>
-      <h2 class="screen-title-text">⚔️ キャラクターをえらぼう！</h2>
+      <h2 class="screen-title-text">⚔️ 冒険者の情報を入力</h2>
     </div>
-    <div class="character-grid" id="character-grid">
-      <!-- JSで生成 -->
+    <div class="char-setup">
+      <div class="char-name-section">
+        <label class="setup-label" for="player-name">✏️ 勇者の名前</label>
+        <input type="text" id="player-name" placeholder="名前をいれてね" maxlength="10">
+      </div>
+      <div class="job-section">
+        <div class="setup-label">⚔️ 職業をえらぼう</div>
+        <div class="job-grid" id="job-grid">
+          <!-- JSで生成 -->
+        </div>
+      </div>
+      <button id="btn-select-char" class="btn-primary btn-lg" disabled>
+        <span class="btn-icon">🏰</span> 冒険へ出発！
+      </button>
     </div>
-    <div class="char-name-input">
-      <label for="player-name">勇者の名前：</label>
-      <input type="text" id="player-name" placeholder="ひとのなまえをいれてね" maxlength="10">
-    </div>
-    <button id="btn-select-char" class="btn-primary btn-lg" disabled>
-      <span class="btn-icon">🏰</span> この勇者で冒険へ！
-    </button>
   </div>
 
   <!-- ========== ステージ選択画面 ========== -->
@@ -221,8 +230,20 @@
   <!-- ========== 浮遊する設定ボタン ========== -->
   <button id="btn-settings" class="floating-settings" aria-label="設定">⚙️</button>
 
-  <!-- ========== 効果音(ダミー) ========== -->
+  <!-- ========== カスタム確認ダイアログ ========== -->
+  <div id="modal-confirm" class="modal-overlay hidden">
+    <div class="modal-content modal-confirm-content">
+      <div class="confirm-icon">⚠️</div>
+      <p class="confirm-message" id="confirm-message">本当に実行しますか？</p>
+      <div class="confirm-buttons">
+        <button id="confirm-yes" class="btn-danger">はい、リセットする</button>
+        <button id="confirm-no" class="btn-secondary">キャンセル</button>
+      </div>
+    </div>
+  </div>
+
   <script src="questions.js"></script>
   <script src="app.js"></script>
 </body>
+
 </html>

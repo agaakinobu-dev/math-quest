@@ -29,10 +29,26 @@ const CONFIG = {
 
 // ===================== キャラクターデータ =====================
 const CHARACTERS = [
-    { id: 'warrior', name: '勇者アレク', emoji: '⚔️', type: '見習い勇者', atkBonus: 1.2, expBonus: 1.0, color: '#f5c842', description: '攻撃力が高い！正解時のダメージがUP', stats: { atk: 80, mag: 40, def: 60 } },
-    { id: 'mage', name: '魔法使いリラ', emoji: '🔮', type: '魔法使い', atkBonus: 1.0, expBonus: 1.3, color: '#ce93d8', description: '経験値が多くもらえる！レベルアップが早い', stats: { atk: 40, mag: 90, def: 30 } },
-    { id: 'scholar', name: '学者ノア', emoji: '📚', type: '天才学者', atkBonus: 1.0, expBonus: 1.1, color: '#4fc3f7', description: 'ヒントが得意！ヒント回数が1回増える', stats: { atk: 50, mag: 60, def: 70 } },
-    { id: 'archer', name: '弓使いセナ', emoji: '🏹', type: '疾風の射手', atkBonus: 1.1, expBonus: 1.0, color: '#81c784', description: 'バランス型。コンボが続きやすい', stats: { atk: 70, mag: 50, def: 50 } }
+    {
+        id: 'warrior', name: '勇者', emoji: '⚔️', type: '勇者', atkBonus: 1.3, expBonus: 1.0, color: '#f5c842',
+        description: '正解時のダメージが大きい！攻撃嵐區型。',
+        bonusLabel: '攻撃力+30%', bonusColor: '#f5c842'
+    },
+    {
+        id: 'fighter', name: '戦士', emoji: '🛡️', type: '戦士', atkBonus: 1.1, expBonus: 1.1, color: '#81c784',
+        description: '攻撃・EXP両方が広く高いオールラウンダー型。',
+        bonusLabel: '全能バランス', bonusColor: '#81c784'
+    },
+    {
+        id: 'mage', name: '魔法使い', emoji: '🔮', type: '魔法使い', atkBonus: 1.0, expBonus: 1.3, color: '#ce93d8',
+        description: '経験値が30%増し。レベルアップが早い！',
+        bonusLabel: 'EXP+30%', bonusColor: '#ce93d8'
+    },
+    {
+        id: 'scholar', name: '学者', emoji: '📚', type: '学者', atkBonus: 1.0, expBonus: 1.1, color: '#4fc3f7',
+        description: 'ヒントが1回余分に使える！知識で戦う型。',
+        bonusLabel: 'ヒント+1回', bonusColor: '#4fc3f7'
+    }
 ];
 
 // ===================== ステージデータ =====================
@@ -208,48 +224,49 @@ document.getElementById('btn-review-title').addEventListener('click', () => {
 
 // ===================== キャラクター選択 =====================
 function initCharacterScreen() {
-    const grid = document.getElementById('character-grid');
+    const grid = document.getElementById('job-grid');
     grid.innerHTML = '';
+    selectedJobId = null;
+    document.getElementById('player-name').value = '';
+    document.getElementById('btn-select-char').disabled = true;
+
     CHARACTERS.forEach(c => {
         const card = document.createElement('div');
-        card.className = 'char-card';
+        card.className = 'job-card';
         card.dataset.id = c.id;
-        const statBars = ['atk', 'mag', 'def'].map(s => `
-      <div class="char-stat-row"><span>${s.toUpperCase()}</span></div>
-      <div class="char-stat-bar"><div class="char-stat-fill" style="width:${c.stats[s]}%;background:${c.color}"></div></div>
-    `).join('');
         card.innerHTML = `
-      <span class="char-emoji">${c.emoji}</span>
-      <div class="char-name" style="color:${c.color}">${c.name}</div>
-      <div class="char-type">${c.type}</div>
-      <div class="char-stat">${statBars}</div>
-      <div style="font-size:10px;color:#9ba0c8;margin-top:.5rem;line-height:1.3">${c.description}</div>
-    `;
-        card.addEventListener('click', () => selectCharacter(c.id));
+          <span class="job-emoji">${c.emoji}</span>
+          <span class="job-name" style="color:${c.color}">${c.name}</span>
+          <span class="job-desc">${c.description}</span>
+          <span class="job-bonus" style="background:${c.color}22;color:${c.color};border:1px solid ${c.color}55">${c.bonusLabel}</span>
+        `;
+        card.addEventListener('click', () => selectJob(c.id));
         grid.appendChild(card);
     });
 
+    // 名前入力リスナ（新規登録）
     const nameInput = document.getElementById('player-name');
-    nameInput.value = '';
-    nameInput.addEventListener('input', updateSelectBtn);
+    const newInput = nameInput.cloneNode(true);
+    nameInput.parentNode.replaceChild(newInput, nameInput);
+    newInput.addEventListener('input', updateSelectBtn);
 }
 
-let selectedCharId = null;
-function selectCharacter(id) {
-    selectedCharId = id;
-    document.querySelectorAll('.char-card').forEach(c => {
+let selectedJobId = null;
+function selectJob(id) {
+    selectedJobId = id;
+    document.querySelectorAll('.job-card').forEach(c => {
         c.classList.toggle('selected', c.dataset.id === id);
     });
     updateSelectBtn();
 }
 function updateSelectBtn() {
     const name = document.getElementById('player-name').value.trim();
-    document.getElementById('btn-select-char').disabled = !selectedCharId || !name;
+    document.getElementById('btn-select-char').disabled = !selectedJobId || !name;
 }
 
 document.getElementById('btn-back-to-title').addEventListener('click', () => showScreen('title', 'left'));
 document.getElementById('btn-select-char').addEventListener('click', () => {
-    state.player = CHARACTERS.find(c => c.id === selectedCharId);
+    state.player = CHARACTERS.find(c => c.id === selectedJobId);
     state.playerName = document.getElementById('player-name').value.trim() || '勇者';
     state.level = 1;
     state.exp = 0;
@@ -257,6 +274,7 @@ document.getElementById('btn-select-char').addEventListener('click', () => {
     state.stagesCleared = [];
     state.wrongQuestions = [];
     state.combo = 0;
+    saveGame(); // 新規ゲーム開始時にも即セーブ
     initStageScreen();
     showScreen('stage', 'right');
 });
@@ -267,7 +285,7 @@ function initStageScreen() {
     const map = document.getElementById('stage-map');
     map.innerHTML = '';
 
-    // 単元ごとにセクション分け
+    // 単元ごとにセクション分け（レベルロックなし — 全単元から自由に選択可）
     const units = [...new Set(STAGES.map(s => s.unit))];
     units.forEach(unit => {
         const secTitle = document.createElement('div');
@@ -278,24 +296,20 @@ function initStageScreen() {
         STAGES.filter(s => s.unit === unit).forEach(stage => {
             const card = document.createElement('div');
             const isCleared = state.stagesCleared.includes(stage.id);
-            const isLocked = state.level < stage.minLevel;
-            card.className = `stage-card${isLocked ? ' locked' : ''}${isCleared ? ' cleared' : ''}`;
+            card.className = `stage-card${isCleared ? ' cleared' : ''}`;
             card.innerHTML = `
-        <div class="stage-icon">${isLocked ? '🔒' : stage.emoji}</div>
+        <div class="stage-icon">${stage.emoji}</div>
         <div class="stage-info">
           <div class="stage-name">${stage.name}</div>
           <div class="stage-desc">${stage.desc}</div>
           <div class="stage-meta">
             <span class="stage-tag ${stage.difficulty}">${diffLabel(stage.difficulty)}</span>
             <span class="stage-tag">${stage.qCount}問</span>
-            <span class="stage-tag">Lv.${stage.minLevel}〜</span>
           </div>
         </div>
-        <div class="stage-card-status">${isCleared ? '✅' : isLocked ? '🔒' : '▶'}</div>
+        <div class="stage-card-status">${isCleared ? '✅' : '▶'}</div>
       `;
-            if (!isLocked) {
-                card.addEventListener('click', () => startStage(stage));
-            }
+            card.addEventListener('click', () => startStage(stage));
             map.appendChild(card);
         });
     });
@@ -670,11 +684,10 @@ document.getElementById('btn-levelup-continue').addEventListener('click', () => 
 
 // ステージクリア後のボタン
 document.getElementById('btn-next-stage').addEventListener('click', () => {
-    // 次のステージを自動選択（現在のステージの次）
     const curIdx = STAGES.findIndex(s => s.id === state.currentStage.id);
     const next = STAGES[curIdx + 1];
-    if (next && state.level >= next.minLevel) {
-        startStage(next);
+    if (next) {
+        startStage(next); // レベルロックなしで次ステージへ
     } else {
         initStageScreen();
         showScreen('stage', 'left');
@@ -729,6 +742,25 @@ function initReviewScreen() {
 document.getElementById('btn-back-from-review').addEventListener('click', () => showScreen('title', 'left'));
 
 // ===================== 設定モーダル =====================
+function showCustomConfirm(message, onYes) {
+    document.getElementById('confirm-message').textContent = message;
+    document.getElementById('modal-confirm').classList.remove('hidden');
+    // 一度リスナをクリアして再登録（二重登録防止のためclone使用）
+    const yesBtn = document.getElementById('confirm-yes');
+    const noBtn = document.getElementById('confirm-no');
+    const newYes = yesBtn.cloneNode(true);
+    const newNo = noBtn.cloneNode(true);
+    yesBtn.parentNode.replaceChild(newYes, yesBtn);
+    noBtn.parentNode.replaceChild(newNo, noBtn);
+    newYes.addEventListener('click', () => {
+        document.getElementById('modal-confirm').classList.add('hidden');
+        onYes();
+    });
+    newNo.addEventListener('click', () => {
+        document.getElementById('modal-confirm').classList.add('hidden');
+    });
+}
+
 document.getElementById('btn-settings').addEventListener('click', () => {
     document.getElementById('modal-settings').classList.remove('hidden');
 });
@@ -746,10 +778,13 @@ document.getElementById('sfx-volume').addEventListener('input', e => {
     state.sfxVolume = +e.target.value;
 });
 document.getElementById('btn-reset-data').addEventListener('click', () => {
-    if (confirm('セーブデータをリセットしますか？（取り消せません）')) {
-        localStorage.removeItem(CONFIG.SAVE_KEY);
-        location.reload();
-    }
+    showCustomConfirm(
+        'セーブデータをリセットしますか？\nレベル・経験値・復習リストが\nすべて消えます。',
+        () => {
+            localStorage.removeItem(CONFIG.SAVE_KEY);
+            location.reload();
+        }
+    );
 });
 
 // ===================== ユーティリティ =====================
