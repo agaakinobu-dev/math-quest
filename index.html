@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>数学クエスト - 勇者の試練 | 中1数学RPG学習アプリ</title>
+  <meta name="description" content="中学1年生向けRPG風数学学習アプリ。正負の数・文字式・方程式などを冒険しながら楽しく学べる！">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800;900&family=Zen+Kaku+Gothic+New:wght@400;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- ========== パーティクル背景 ========== -->
+  <div id="particles-bg" aria-hidden="true"></div>
+
+  <!-- ========== タイトル画面 ========== -->
+  <div id="screen-title" class="screen active">
+    <div class="title-content">
+      <div class="title-logo">
+        <div class="title-subtitle">中1数学 冒険RPG</div>
+        <h1 class="title-name">
+          <span class="title-kanji">数学クエスト</span>
+          <span class="title-sub">〜 勇者の試練 〜</span>
+        </h1>
+        <div class="title-tagline">✨ 問題に正解して、伝説の勇者になれ！ ✨</div>
+      </div>
+      <div class="title-hero-display">
+        <div class="hero-orb">⚔️</div>
+        <div class="hero-sparkles">
+          <span class="sparkle s1">🌟</span>
+          <span class="sparkle s2">✨</span>
+          <span class="sparkle s3">💫</span>
+          <span class="sparkle s4">🌟</span>
+          <span class="sparkle s5">✨</span>
+        </div>
+      </div>
+      <div class="title-buttons">
+        <button id="btn-new-game" class="btn-primary btn-xl">
+          <span class="btn-icon">⚔️</span> 冒険を始める
+        </button>
+        <button id="btn-continue" class="btn-secondary btn-xl">
+          <span class="btn-icon">📖</span> つづきから
+        </button>
+        <button id="btn-review-title" class="btn-outline btn-xl">
+          <span class="btn-icon">📚</span> まちがえた問題
+        </button>
+      </div>
+      <div class="title-units">
+        <span class="unit-badge">正負の数</span>
+        <span class="unit-badge">文字式</span>
+        <span class="unit-badge">1次方程式</span>
+        <span class="unit-badge">比例と反比例</span>
+        <span class="unit-badge">図形</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== キャラクター選択画面 ========== -->
+  <div id="screen-character" class="screen">
+    <div class="screen-header">
+      <button id="btn-back-to-title" class="btn-back">← もどる</button>
+      <h2 class="screen-title-text">⚔️ キャラクターをえらぼう！</h2>
+    </div>
+    <div class="character-grid" id="character-grid">
+      <!-- JSで生成 -->
+    </div>
+    <div class="char-name-input">
+      <label for="player-name">勇者の名前：</label>
+      <input type="text" id="player-name" placeholder="ひとのなまえをいれてね" maxlength="10">
+    </div>
+    <button id="btn-select-char" class="btn-primary btn-lg" disabled>
+      <span class="btn-icon">🏰</span> この勇者で冒険へ！
+    </button>
+  </div>
+
+  <!-- ========== ステージ選択画面 ========== -->
+  <div id="screen-stage" class="screen">
+    <div class="screen-header">
+      <button id="btn-back-to-char" class="btn-back">← もどる</button>
+      <h2 class="screen-title-text">🗺️ ステージをえらぼう！</h2>
+    </div>
+    <div class="player-status-bar" id="player-status-bar">
+      <!-- JSで生成 -->
+    </div>
+    <div class="stage-map" id="stage-map">
+      <!-- JSで生成 -->
+    </div>
+  </div>
+
+  <!-- ========== バトル画面 ========== -->
+  <div id="screen-battle" class="screen">
+    <!-- ステータスバー -->
+    <div class="battle-header">
+      <div class="battle-player-info" id="battle-player-info">
+        <!-- JSで生成 -->
+      </div>
+      <div class="battle-stage-info" id="battle-stage-info">
+        <!-- JSで生成 -->
+      </div>
+    </div>
+
+    <!-- 敵エリア -->
+    <div class="battle-enemy-area" id="battle-enemy-area">
+      <div class="enemy-container">
+        <div id="enemy-name" class="enemy-name">スライム</div>
+        <div id="enemy-sprite" class="enemy-sprite">🟢</div>
+        <div id="enemy-hp-bar-wrapper" class="enemy-hp-bar-wrapper">
+          <div class="enemy-hp-label">HP</div>
+          <div class="enemy-hp-bar">
+            <div id="enemy-hp-fill" class="enemy-hp-fill"></div>
+          </div>
+          <div id="enemy-hp-text" class="enemy-hp-text">100/100</div>
+        </div>
+      </div>
+      <div id="battle-message" class="battle-message">...</div>
+    </div>
+
+    <!-- ヒント表示 -->
+    <div id="hint-box" class="hint-box hidden">
+      <div class="hint-title">💡 ヒント</div>
+      <div id="hint-text" class="hint-text"></div>
+    </div>
+
+    <!-- 問題エリア -->
+    <div class="battle-question-area">
+      <div class="question-meta">
+        <span id="q-unit-badge" class="q-unit-badge">正負の数</span>
+        <span id="q-difficulty" class="q-difficulty">⭐ Easy</span>
+        <span id="q-number" class="q-number">1/10</span>
+      </div>
+      <div id="question-text" class="question-text">問題テキストがここに入ります</div>
+      <div id="choices-grid" class="choices-grid">
+        <!-- JSで生成 -->
+      </div>
+    </div>
+
+    <!-- アクションバー -->
+    <div class="battle-action-bar">
+      <button id="btn-hint" class="btn-hint">💡 ヒント</button>
+      <div id="combo-display" class="combo-display hidden">
+        🔥 <span id="combo-count">0</span> コンボ！
+      </div>
+      <div id="timer-display" class="timer-display">⏱ <span id="timer-sec">30</span>秒</div>
+    </div>
+  </div>
+
+  <!-- ========== 正解 / 不正解 エフェクト画面 ========== -->
+  <div id="screen-result-effect" class="screen">
+    <div class="result-effect-content" id="result-effect-content">
+      <!-- JSで生成 -->
+    </div>
+  </div>
+
+  <!-- ========== レベルアップ画面 ========== -->
+  <div id="screen-levelup" class="screen">
+    <div class="levelup-content">
+      <div class="levelup-fireworks" id="levelup-fireworks" aria-hidden="true"></div>
+      <div class="levelup-badge">🎉</div>
+      <h2 class="levelup-title">レベルアップ！</h2>
+      <div class="levelup-level" id="levelup-level">Lv. 5</div>
+      <div class="levelup-title-name" id="levelup-title-name">騎士</div>
+      <div class="levelup-bonus" id="levelup-bonus">ヒントが2回使えるようになった！</div>
+      <div class="levelup-char" id="levelup-char">⚔️</div>
+      <button id="btn-levelup-continue" class="btn-primary btn-lg">
+        冒険をつづける ▶
+      </button>
+    </div>
+  </div>
+
+  <!-- ========== ステージクリア画面 ========== -->
+  <div id="screen-stage-clear" class="screen">
+    <div class="stage-clear-content">
+      <div class="clear-stars" id="clear-stars">⭐⭐⭐</div>
+      <h2 class="clear-title">ステージクリア！</h2>
+      <div class="clear-stats" id="clear-stats">
+        <!-- JSで生成 -->
+      </div>
+      <div class="clear-buttons">
+        <button id="btn-next-stage" class="btn-primary btn-lg">次のステージへ ▶</button>
+        <button id="btn-back-to-map" class="btn-secondary btn-lg">マップにもどる</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== 復習画面 ========== -->
+  <div id="screen-review" class="screen">
+    <div class="screen-header">
+      <button id="btn-back-from-review" class="btn-back">← もどる</button>
+      <h2 class="screen-title-text">📚 まちがえた問題の復習</h2>
+    </div>
+    <div id="review-list" class="review-list">
+      <!-- JSで生成 -->
+    </div>
+  </div>
+
+  <!-- ========== モーダル: 設定 ========== -->
+  <div id="modal-settings" class="modal-overlay hidden">
+    <div class="modal-content">
+      <h3>⚙️ 設定</h3>
+      <div class="setting-row">
+        <label>BGM音量</label>
+        <input type="range" id="bgm-volume" min="0" max="100" value="70">
+      </div>
+      <div class="setting-row">
+        <label>効果音</label>
+        <input type="range" id="sfx-volume" min="0" max="100" value="80">
+      </div>
+      <div class="setting-row">
+        <label>タイマー</label>
+        <label class="toggle">
+          <input type="checkbox" id="timer-toggle" checked>
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <button id="btn-close-settings" class="btn-secondary">とじる</button>
+      <button id="btn-reset-data" class="btn-danger">データをリセット</button>
+    </div>
+  </div>
+
+  <!-- ========== 浮遊する設定ボタン ========== -->
+  <button id="btn-settings" class="floating-settings" aria-label="設定">⚙️</button>
+
+  <!-- ========== 効果音(ダミー) ========== -->
+  <script src="questions.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
